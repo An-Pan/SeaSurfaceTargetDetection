@@ -11,6 +11,42 @@
 #include <functional>
 #include <stdexcept>
 
+// Boost
+#include <boost/regex.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/filesystem.hpp>
+
+namespace file
+{
+	static const vector<string>& scan_files(const string& rootPath, vector<string>& container = *(new vector<string>())) 
+	{
+		namespace fs = boost::filesystem;
+		fs::path fullpath(rootPath);
+		vector<string> &ret = container;
+
+		if (!fs::exists(fullpath)) { return ret; }
+		fs::directory_iterator end_iter;
+		for (fs::directory_iterator iter(fullpath); iter != end_iter; iter++) {
+			try {
+				if (fs::is_directory(*iter)) {
+					//ret.push_back(iter->path().string());
+					//scan_files(iter->path().string(), ret);
+					continue;
+				}
+				else {
+					ret.push_back(iter->path().string());
+				}
+			}
+			catch (const std::exception & ex) {
+				std::cerr << ex.what() << std::endl;
+				continue;
+			}
+		}
+		return ret;
+	}
+}
+
 class ThreadPool {
 public:
 	ThreadPool(size_t);
